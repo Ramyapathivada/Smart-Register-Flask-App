@@ -3,7 +3,7 @@ app = Flask(__name__)
 @app.route('/') 
 def index(): 
     """ 
-    Renders the main index.html template for the Smart Register applica on. 
+    Renders the main index.html template for the Smart Register application. 
     """ 
     return render_template('index.html') 
  
