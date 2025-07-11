@@ -19,7 +19,7 @@ const stockModificationScreen = document.getElementById('stockModificationScreen
 const itemForm = document.getElementById('itemForm'); 
 const itemIdInput = document.getElementById('itemId'); 
 const itemNameInput = document.getElementById('itemName'); 
-const itemQuan tyInput = document.getElementById('itemQuantity'); 
+const itemQuantityInput = document.getElementById('itemQuantity'); 
 const itemPriceInput = document.getElementById('itemPrice'); // Now "Cost Price" 
 const saveItemBtn = document.getElementById('saveItemBtn'); 
 const clearFormBtn = document.getElementById('clearFormBtn'); 
@@ -122,7 +122,7 @@ function renderInventory(itemsToDisplay = inventory) {
 900">${item.id}</td> 
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${item.name}</td> 
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray
-700">${item.quan ty}</td> 
+700">${item.quantity}</td> 
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray
 700">₹${item.price.toFixed(2)}</td> 
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"> 
@@ -148,7 +148,7 @@ hover:bg-red-200 transi on dura on-150 ease-in-out">
 function updateInventoryMetrics() { 
     const totalUnique = inventory.length; 
     const totalQty = inventory.reduce((sum, item) => sum + item.quantity, 0); 
-    const totalVal = inventory.reduce((sum, item) => sum + (item.quan ty * item.price), 0); 
+    const totalVal = inventory.reduce((sum, item) => sum + (item.quantity * item.price), 0); 
  
     totalUniqueItemsDisplay.textContent = totalUnique; 
     totalQuantityDisplay.textContent = totalQty; 
@@ -164,7 +164,7 @@ exis ng op ons
     inventory.forEach(item => { 
         const option = document.createElement('option'); 
         option.value = item.id; 
-        option.textContent = `${item.name} (ID: ${item.id}, Qty: ${item.quan ty}, Cost: 
+        option.textContent = `${item.name} (ID: ${item.id}, Qty: ${item.quantity}, Cost: 
 ₹${item.price.toFixed(2)})`; 
         modifyItemIdSelect.appendChild(option); 
     }); 
@@ -185,7 +185,7 @@ function updateFinancialSummary() {
 function showScreen(screenId) { 
     // Hide all screens 
     document.querySelectorAll('.screen').forEach(screen => { 
-        screen.classList.remove('ac ve'); 
+        screen.classList.remove('active'); 
     }); 
  
     // Deac vate all nav bu ons 
@@ -202,7 +202,7 @@ function showScreen(screenId) {
         updateInventoryMetrics(); // Update metrics when this screen is ac ve 
         inventorySearchBar.value = ''; // Clear search bar on screen switch 
     } 
-    if (screenId === 'stockModifica onScreen') { 
+    if (screenId === 'stockModificationScreen') { 
         navStockModifica onBtn.classList.add('active'); 
         populateModifyItemSelect(); // Populate dropdown when this screen is ac ve 
         updateFinancialSummary(); // Update financial summary 
@@ -239,22 +239,22 @@ itemForm.addEventListener('submit', function(event) {
  
     if (editingItemId) { 
         // Edi ng exis ng item 
-        const itemIndex = inventory.findIndex(item => item.id === edi ngItemId); 
+        const itemIndex = inventory.findIndex(item => item.id === editingItemId); 
         if (itemIndex !== -1) { 
             // Check if ID was changed and if new ID is unique 
-            if (edi ngItemId !== id && inventory.some(item => item.id === id)) { 
+            if (editingItemId !== id && inventory.some(item => item.id === id)) { 
                 showMessage('Item ID already exists. Please use a unique ID.', 'error'); 
                 return; 
             } 
             inventory[itemIndex].id = id; // Update ID if changed 
             inventory[itemIndex].name = name; 
-            inventory[itemIndex].quan ty = quan ty; 
+            inventory[itemIndex].quantity = quan ty; 
             inventory[itemIndex].price = price; 
             showMessage('Item updated successfully!', 'success'); 
         } 
         editingItemId = null; // Reset edi ng state 
         saveItemBtn.textContent = 'Add Item'; // Change bu on back 
-        itemIdInput.removeA ribute('readonly'); // Make ID editable again 
+        itemIdInput.removeAttribute('readonly'); // Make ID editable again 
     } else { 
         // Adding new item 
         // Check for unique ID when adding a new item 
@@ -266,7 +266,7 @@ itemForm.addEventListener('submit', function(event) {
         const newItem = { 
             id: id, 
             name: name, 
-            quan ty: quan ty, 
+            quantity: quantity, 
             price: price // This is the cost price 
         }; 
         inventory.push(newItem); 
@@ -290,7 +290,7 @@ function clearForm() {
     itemPriceInput.value = ''; 
     editingItemId = null; 
     saveItemBtn.textContent = 'Add Item'; 
-    itemIdInput.removeA ribute('readonly'); // Ensure ID is editable for new entries 
+    itemIdInput.removeAttribute('readonly'); // Ensure ID is editable for new entries 
     itemNameInput.focus(); // Focus on the first input field 
 } 
  
@@ -306,7 +306,7 @@ function editItem(id) {
     if (itemToEdit) { 
         itemIdInput.value = itemToEdit.id; 
         itemNameInput.value = itemToEdit.name; 
-        itemQuan tyInput.value = itemToEdit.quan ty; 
+        itemQuan tyInput.value = itemToEdit.quantity; 
         itemPriceInput.value = itemToEdit.price; 
         editingItemId = id; 
         saveItemBtn.textContent = 'Update Item'; 
@@ -325,7 +325,7 @@ function deleteItem(id) {
     const initialLength = inventory.length; 
     const deletedItem = inventory.find(item => item.id === id); 
     inventory = inventory.filter(item => item.id !== id); 
-    if (inventory.length < ini alLength) { 
+    if (inventory.length < initialLength) { 
         showMessage(`Item "${deletedItem ? deletedItem.name : id}" deleted successfully!`, 
 'success'); 
     } else { 
@@ -396,7 +396,7 @@ document.querySelector('input[name="changeReason"]:checked').value;
         showMessage('Please select an item.', 'error'); 
         return; 
     } 
-    if (isNaN(quan tyChange) || quan tyChange <= 0) { 
+    if (isNaN(quan tyChange) || quantityChange <= 0) { 
         showMessage('Please enter a valid posi ve quantity.', 'error'); 
         return; 
     } 
@@ -419,17 +419,17 @@ document.querySelector('input[name="changeReason"]:checked').value;
     } 
  
     // Perform stock modifica on 
-    itemToModify.quan ty -= quantityChange; 
+    itemToModify.quantity -= quantityChange; 
  
     if (changeReason === 'sale') { 
-        // Profit/Loss = (Sale Price - Cost Price) * Quan ty 
+        // Profit/Loss = (Sale Price - Cost Price) * Quantity 
         const itemCostPrice = itemToModify.price; 
         const profitLossPerUnit = salePrice - itemCostPrice; 
         const transactionProfitLoss = profitLossPerUnit * quantityChange; 
  
-        if (transac onProfitLoss >= 0) { 
+        if (transactionProfitLoss >= 0) { 
             totalProfit += transactionProfitLoss; 
-            showMessage(`Sold ${quan tyChange} of ${itemToModify.name} for 
+            showMessage(`Sold ${quantityChange} of ${itemToModify.name} for 
 ₹${salePrice.toFixed(2)} each. Profit: ₹${transac onProfitLoss.toFixed(2)}`, 'success'); 
         } else { 
             totalLoss += Math.abs(transactionProfitLoss); 
