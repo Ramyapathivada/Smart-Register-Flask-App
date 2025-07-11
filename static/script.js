@@ -3,37 +3,37 @@
 let inventory = []; 
 let totalProfit = 0; 
 let totalLoss = 0; 
-let edi ngItemId = null; // To keep track of the item being edited 
+let editingItemId = null; // To keep track of the item being edited 
  
 // DOM Elements 
 // Naviga on 
 const navAddItemBtn = document.getElementById('navAddItem'); 
 const navInventoryViewBtn = document.getElementById('navInventoryView'); 
-const navStockModifica onBtn = document.getElementById('navStockModifica on'); 
-const navBu ons = document.querySelectorAll('.nav-bu on'); 
+const navStockModifica onBtn = document.getElementById('navStockModification'); 
+const navBu ons = document.querySelectorAll('.nav-button'); 
 // Screens 
 const addItemScreen = document.getElementById('addItemScreen'); 
 const inventoryViewScreen = document.getElementById('inventoryViewScreen'); 
-const stockModifica onScreen = document.getElementById('stockModifica onScreen'); 
+const stockModificationScreen = document.getElementById('stockModificationScreen'); 
 // Add Item Screen Elements 
 const itemForm = document.getElementById('itemForm'); 
 const itemIdInput = document.getElementById('itemId'); 
 const itemNameInput = document.getElementById('itemName'); 
-const itemQuan tyInput = document.getElementById('itemQuan ty'); 
+const itemQuan tyInput = document.getElementById('itemQuantity'); 
 const itemPriceInput = document.getElementById('itemPrice'); // Now "Cost Price" 
 const saveItemBtn = document.getElementById('saveItemBtn'); 
 const clearFormBtn = document.getElementById('clearFormBtn'); 
 // Inventory View Screen Elements 
 const totalUniqueItemsDisplay = document.getElementById('totalUniqueItems'); 
-const totalQuan tyDisplay = document.getElementById('totalQuan ty'); 
-const totalValua onDisplay = document.getElementById('totalValua on'); 
+const totalQuantityDisplay = document.getElementById('totalQuantity'); 
+const totalValuationDisplay = document.getElementById('totalValuation'); 
 const inventorySearchBar = document.getElementById('inventorySearchBar'); 
 const inventoryList = document.getElementById('inventoryList'); 
 const noItemsMessage = document.getElementById('noItemsMessage'); 
 // Stock Modifica on Screen Elements 
-const stockModifica onForm = document.getElementById('stockModifica onForm'); 
+const stockModificationForm = document.getElementById('stockModificationForm'); 
 const modifyItemIdSelect = document.getElementById('modifyItemId'); 
-const modifyQuan tyInput = document.getElementById('modifyQuan ty'); 
+const modifyQuantityInput = document.getElementById('modifyQuantity'); 
 const reasonSaleRadio = document.getElementById('reasonSale'); 
 const reasonDamageRadio = document.getElementById('reasonDamage'); 
 const salePriceContainer = document.getElementById('salePriceContainer'); 
@@ -47,7 +47,7 @@ const globalMessageBox = document.getElementById('globalMessageBox');
 * @param {string} message - The message to display. 
 * @param {string} type - 'success', 'error', or 'info' to determine styling. 
 */ 
-func on showMessage(message, type) { 
+function showMessage(message, type) { 
 globalMessageBox.textContent = message; 
 globalMessageBox.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red
 100', 'text-red-800', 'bg-blue-100', 'text-blue-800'); 
@@ -67,7 +67,7 @@ globalMessageBox.classList.add('bg-red-100', 'text-red-800');
 /** 
  * Saves the current inventory, total profit, and total loss to local storage. 
  */ 
-func on saveState() { 
+function saveState() { 
     try { 
         localStorage.setItem('inventory', JSON.stringify(inventory)); 
         localStorage.setItem('totalProfit', totalProfit.toFixed(2)); 
@@ -81,7 +81,7 @@ func on saveState() {
 /** 
  * Loads inventory, total profit, and total loss data from local storage. 
  */ 
-func on loadState() { 
+function loadState() { 
     try { 
         const storedInventory = localStorage.getItem('inventory'); 
         if (storedInventory) { 
@@ -105,7 +105,7 @@ func on loadState() {
  * Renders the inventory items to the table on the Inventory View screen. 
  * @param {Array} itemsToDisplay - The array of items to render (can be filtered). 
  */ 
-func on renderInventory(itemsToDisplay = inventory) { 
+function renderInventory(itemsToDisplay = inventory) { 
     inventoryList.innerHTML = ''; // Clear exis ng list 
     if (itemsToDisplay.length === 0) { 
         noItemsMessage.classList.remove('hidden'); 
@@ -126,16 +126,16 @@ func on renderInventory(itemsToDisplay = inventory) {
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray
 700">₹${item.price.toFixed(2)}</td> 
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"> 
-                <bu on onclick="editItem('${item.id}')" 
+                <button onclick="editItem('${item.id}')" 
                         class="text-blue-600 hover:text-blue-900 mr-3 px-3 py-1 rounded-md bg-blue
 100 hover:bg-blue-200 transi on dura on-150 ease-in-out"> 
                     Edit 
-                </bu on> 
-                <bu on onclick="deleteItem('${item.id}')" 
+                </button> 
+                <button onclick="deleteItem('${item.id}')" 
                         class="text-red-600 hover:text-red-900 px-3 py-1 rounded-md bg-red-100 
 hover:bg-red-200 transi on dura on-150 ease-in-out"> 
                     Delete 
-                </bu on> 
+                </button> 
             </td> 
         `; 
         inventoryList.appendChild(row); 
@@ -145,35 +145,35 @@ hover:bg-red-200 transi on dura on-150 ease-in-out">
 /** 
  * Calculates and displays overall inventory metrics. 
  */ 
-func on updateInventoryMetrics() { 
+function updateInventoryMetrics() { 
     const totalUnique = inventory.length; 
-    const totalQty = inventory.reduce((sum, item) => sum + item.quan ty, 0); 
+    const totalQty = inventory.reduce((sum, item) => sum + item.quantity, 0); 
     const totalVal = inventory.reduce((sum, item) => sum + (item.quan ty * item.price), 0); 
  
     totalUniqueItemsDisplay.textContent = totalUnique; 
-    totalQuan tyDisplay.textContent = totalQty; 
-    totalValua onDisplay.textContent = `₹${totalVal.toFixed(2)}`; 
+    totalQuantityDisplay.textContent = totalQty; 
+    totalValuationDisplay.textContent = `₹${totalVal.toFixed(2)}`; 
 } 
  
 /** 
  * Populates the item selec on dropdown on the Stock Modifica on screen. 
  */ 
-func on populateModifyItemSelect() { 
+function populateModifyItemSelect() { 
     modifyItemIdSelect.innerHTML = '<op on value="">-- Select an item --</op on>'; // Clear 
 exis ng op ons 
     inventory.forEach(item => { 
-        const op on = document.createElement('op on'); 
-        op on.value = item.id; 
-        op on.textContent = `${item.name} (ID: ${item.id}, Qty: ${item.quan ty}, Cost: 
+        const option = document.createElement('option'); 
+        option.value = item.id; 
+        option.textContent = `${item.name} (ID: ${item.id}, Qty: ${item.quan ty}, Cost: 
 ₹${item.price.toFixed(2)})`; 
-        modifyItemIdSelect.appendChild(op on); 
+        modifyItemIdSelect.appendChild(option); 
     }); 
 } 
  
 /** 
  * Updates the profit and loss displays. 
  */ 
-func on updateFinancialSummary() { 
+function updateFinancialSummary() { 
     totalProfitDisplay.textContent = `₹${totalProfit.toFixed(2)}`; 
     totalLossDisplay.textContent = `₹${totalLoss.toFixed(2)}`; 
 } 
@@ -182,31 +182,31 @@ func on updateFinancialSummary() {
  * Handles screen switching logic. 
  * @param {string} screenId - The ID of the screen to show. 
  */ 
-func on showScreen(screenId) { 
+function showScreen(screenId) { 
     // Hide all screens 
     document.querySelectorAll('.screen').forEach(screen => { 
         screen.classList.remove('ac ve'); 
     }); 
  
     // Deac vate all nav bu ons 
-    navBu ons.forEach(bu on => { 
-        bu on.classList.remove('ac ve'); 
+    navButtons.forEach(buttonon => { 
+        button.classList.remove('active'); 
     }); 
  
     // Show the selected screen and ac vate its nav bu on 
-    document.getElementById(screenId).classList.add('ac ve'); 
-    if (screenId === 'addItemScreen') navAddItemBtn.classList.add('ac ve'); 
+    document.getElementById(screenId).classList.add('active'); 
+    if (screenId === 'addItemScreen') navAddItemBtn.classList.add('active'); 
     if (screenId === 'inventoryViewScreen') { 
-        navInventoryViewBtn.classList.add('ac ve'); 
+        navInventoryViewBtn.classList.add('active'); 
         renderInventory(); // Re-render inventory when this screen is ac ve 
         updateInventoryMetrics(); // Update metrics when this screen is ac ve 
         inventorySearchBar.value = ''; // Clear search bar on screen switch 
     } 
     if (screenId === 'stockModifica onScreen') { 
-        navStockModifica onBtn.classList.add('ac ve'); 
+        navStockModifica onBtn.classList.add('active'); 
         populateModifyItemSelect(); // Populate dropdown when this screen is ac ve 
         updateFinancialSummary(); // Update financial summary 
-        modifyQuan tyInput.value = ''; // Clear quan ty input 
+        modifyQuantityInput.value = ''; // Clear quan ty input 
         reasonSaleRadio.checked = true; // Default to sale 
         toggleSalePriceInput(); // Show/hide sale price input 
     } 
@@ -223,12 +223,12 @@ showScreen('stockModifica onScreen'));
  * Handles the submission of the item form (add or edit). 
  * @param {Event} event - The form submission event. 
  */ 
-itemForm.addEventListener('submit', func on(event) { 
+itemForm.addEventListener('submit', function(event) { 
     event.preventDefault(); // Prevent default form submission 
  
     const id = itemIdInput.value.trim(); 
     const name = itemNameInput.value.trim(); 
-    const quan ty = parseInt(itemQuan tyInput.value); 
+    const quan ty = parseInt(itemQuantityInput.value); 
     const price = parseFloat(itemPriceInput.value); 
  
     // Basic valida on 
@@ -237,7 +237,7 @@ itemForm.addEventListener('submit', func on(event) {
         return; 
     } 
  
-    if (edi ngItemId) { 
+    if (editingItemId) { 
         // Edi ng exis ng item 
         const itemIndex = inventory.findIndex(item => item.id === edi ngItemId); 
         if (itemIndex !== -1) { 
@@ -252,7 +252,7 @@ itemForm.addEventListener('submit', func on(event) {
             inventory[itemIndex].price = price; 
             showMessage('Item updated successfully!', 'success'); 
         } 
-        edi ngItemId = null; // Reset edi ng state 
+        editingItemId = null; // Reset edi ng state 
         saveItemBtn.textContent = 'Add Item'; // Change bu on back 
         itemIdInput.removeA ribute('readonly'); // Make ID editable again 
     } else { 
@@ -283,12 +283,12 @@ itemForm.addEventListener('submit', func on(event) {
 /** 
  * Clears the form fields on the Add Item screen and resets edi ng state. 
  */ 
-func on clearForm() { 
+function clearForm() { 
     itemIdInput.value = ''; 
     itemNameInput.value = ''; 
-    itemQuan tyInput.value = ''; 
+    itemQuantityInput.value = ''; 
     itemPriceInput.value = ''; 
-    edi ngItemId = null; 
+    editingItemId = null; 
     saveItemBtn.textContent = 'Add Item'; 
     itemIdInput.removeA ribute('readonly'); // Ensure ID is editable for new entries 
     itemNameInput.focus(); // Focus on the first input field 
@@ -301,19 +301,19 @@ clearFormBtn.addEventListener('click', clearForm);
  * Populates the form with data of an item to be edited. 
  * @param {string} id - The ID of the item to edit. 
  */ 
-func on editItem(id) { 
+function editItem(id) { 
     const itemToEdit = inventory.find(item => item.id === id); 
     if (itemToEdit) { 
         itemIdInput.value = itemToEdit.id; 
         itemNameInput.value = itemToEdit.name; 
         itemQuan tyInput.value = itemToEdit.quan ty; 
         itemPriceInput.value = itemToEdit.price; 
-        edi ngItemId = id; 
+        editingItemId = id; 
         saveItemBtn.textContent = 'Update Item'; 
-        itemIdInput.setA ribute('readonly', 'true'); // Make ID read-only during edit 
+        itemIdInput.setAttribute('readonly', 'true'); // Make ID read-only during edit 
         showScreen('addItemScreen'); // Switch to add item screen 
         itemNameInput.focus(); // Focus on the name input for quick edi ng 
-        showMessage(`Edi ng item: ${itemToEdit.name}`, 'info'); 
+        showMessage(`Editing item: ${itemToEdit.name}`, 'info'); 
     } 
 } 
  
@@ -321,8 +321,8 @@ func on editItem(id) {
  * Deletes an item from the inventory. 
  * @param {string} id - The ID of the item to delete. 
  */ 
-func on deleteItem(id) { 
-    const ini alLength = inventory.length; 
+function deleteItem(id) { 
+    const initialLength = inventory.length; 
     const deletedItem = inventory.find(item => item.id === id); 
     inventory = inventory.filter(item => item.id !== id); 
     if (inventory.length < ini alLength) { 
@@ -341,7 +341,7 @@ func on deleteItem(id) {
 /** 
  * Filters inventory items based on search input on the Inventory View screen. 
  */ 
-inventorySearchBar.addEventListener('input', func on() { 
+inventorySearchBar.addEventListener('input', function() { 
     const searchTerm = inventorySearchBar.value.toLowerCase().trim(); 
     const filteredItems = inventory.filter(item => 
         item.name.toLowerCase().includes(searchTerm) || 
@@ -353,10 +353,10 @@ inventorySearchBar.addEventListener('input', func on() {
 /** 
  * Toggles the visibility of the sale price input based on the selected reason. 
  */ 
-func on toggleSalePriceInput() { 
+function toggleSalePriceInput() { 
     if (reasonSaleRadio.checked) { 
         salePriceContainer.classList.remove('hidden'); 
-        salePriceInput.setA ribute('required', 'true'); 
+        salePriceInput.setAttribute('required', 'true'); 
         // Set default sale price to item's cost price when selected item changes 
         const selectedItem = inventory.find(item => item.id === modifyItemIdSelect.value); 
         if (selectedItem) { 
@@ -366,7 +366,7 @@ func on toggleSalePriceInput() {
         } 
     } else { 
         salePriceContainer.classList.add('hidden'); 
-        salePriceInput.removeA ribute('required'); 
+        salePriceInput.removeAttribute('required'); 
         salePriceInput.value = ''; 
     } 
 } 
@@ -383,11 +383,11 @@ modifyItemIdSelect.addEventListener('change', toggleSalePriceInput);
  * Handles the submission of the stock modifica on form. 
  * @param {Event} event - The form submission event. 
  */ 
-stockModifica onForm.addEventListener('submit', func on(event) { 
+stockModificationForm.addEventListener('submit', function(event) { 
     event.preventDefault(); 
  
     const selectedItemId = modifyItemIdSelect.value; 
-    const quan tyChange = parseInt(modifyQuan tyInput.value); 
+    const quantityChange = parseInt(modifyQuan tyInput.value); 
     const changeReason = 
 document.querySelector('input[name="changeReason"]:checked').value; 
     const salePrice = parseFloat(salePriceInput.value); 
@@ -397,7 +397,7 @@ document.querySelector('input[name="changeReason"]:checked').value;
         return; 
     } 
     if (isNaN(quan tyChange) || quan tyChange <= 0) { 
-        showMessage('Please enter a valid posi ve quan ty.', 'error'); 
+        showMessage('Please enter a valid posi ve quantity.', 'error'); 
         return; 
     } 
     if (changeReason === 'sale' && (isNaN(salePrice) || salePrice < 0)) { 
@@ -413,50 +413,49 @@ document.querySelector('input[name="changeReason"]:checked').value;
         return; 
     } 
  
-    if (quan tyChange > itemToModify.quan ty) { 
-        showMessage('Cannot change more than available quan ty.', 'error'); 
+    if (quantityChange > itemToModify.quantity) { 
+        showMessage('Cannot change more than available quantity.', 'error'); 
         return; 
     } 
  
     // Perform stock modifica on 
-    itemToModify.quan ty -= quan tyChange; 
+    itemToModify.quan ty -= quantityChange; 
  
     if (changeReason === 'sale') { 
         // Profit/Loss = (Sale Price - Cost Price) * Quan ty 
         const itemCostPrice = itemToModify.price; 
         const profitLossPerUnit = salePrice - itemCostPrice; 
-        const transac onProfitLoss = profitLossPerUnit * quan tyChange; 
+        const transactionProfitLoss = profitLossPerUnit * quantityChange; 
  
         if (transac onProfitLoss >= 0) { 
-            totalProfit += transac onProfitLoss; 
+            totalProfit += transactionProfitLoss; 
             showMessage(`Sold ${quan tyChange} of ${itemToModify.name} for 
 ₹${salePrice.toFixed(2)} each. Profit: ₹${transac onProfitLoss.toFixed(2)}`, 'success'); 
         } else { 
-            totalLoss += Math.abs(transac onProfitLoss); 
-            showMessage(`Sold ${quan tyChange} of ${itemToModify.name} for 
-₹${salePrice.toFixed(2)} each. Loss: ₹${Math.abs(transac onProfitLoss).toFixed(2)}`, 'info'); 
+            totalLoss += Math.abs(transactionProfitLoss); 
+            showMessage(`Sold ${quantityChange} of ${itemToModify.name} for 
+₹${salePrice.toFixed(2)} each. Loss: ₹${Math.abs(transactionProfitLoss).toFixed(2)}`, 'info'); 
         } 
  
     } else if (changeReason === 'damage') { 
-        totalLoss += (quan tyChange * itemToModify.price); // Loss is based on cost price 
-        showMessage(`Logged ${quan tyChange} of ${itemToModify.name} as damaged. Loss: 
+        totalLoss += (quantityChange * itemToModify.price); // Loss is based on cost price 
+        showMessage(`Logged ${quantityChange} of ${itemToModify.name} as damaged. Loss: 
 ₹${(quan tyChange * itemToModify.price).toFixed(2)}`, 'info'); 
     } 
  
     // Remove item if quan ty drops to 0 or below 
     if (itemToModify.quan ty <= 0) { 
         inventory = inventory.filter(item => item.id !== selectedItemId); 
-        showMessage(`${itemToModify.name} quan ty reached zero and was removed from 
+        showMessage(`${itemToModify.name} quantity reached zero and was removed from 
 inventory.`, 'info'); 
     } 
  
     saveState(); 
-populateModifyItemSelect(); // Re-populate dropdown to reflect new quan es or 
-removed items 
+populateModifyItemSelect(); // Re-populate dropdown to reflect new quan es or removed items 
 updateFinancialSummary(); // Update profit/loss display 
 updateInventoryMetrics(); // Update overall inventory metrics 
 renderInventory(); // Re-render inventory table if ac ve 
-modifyQuan tyInput.value = ''; // Clear the quan ty input a er successful modifica on 
+modifyQuantityInput.value = ''; // Clear the quan ty input a er successful modifica on 
 salePriceInput.value = ''; // Clear sale price input 
 }); 
 // Ini al load and render when the page loads 
